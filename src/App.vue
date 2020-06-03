@@ -1,17 +1,27 @@
 <template>
   <div id="app">
-    <img alt="Vue logo" src="./assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <LinearRegression v-if="notshow"></LinearRegression>
+    <knn></knn>
+    <Kmeans v-if="notshow"></Kmeans>
   </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import LinearRegression from './components/LinearRegression'
+import knn from './components/knn'
+import Kmeans from './components/Kmeans'
 
 export default {
   name: 'App',
+  data () {
+    return {
+      notshow: false
+    }
+  },
   components: {
-    HelloWorld
+    LinearRegression,
+    knn,
+    Kmeans
   }
 }
 </script>
