@@ -23,12 +23,20 @@
   </div>
   <div class="add-wrapper"><button @click="add">Add</button></div>
   <div class="plot-wrapper"><button @click="plot">Plot</button></div>
+  <div class="predict-wrapper">
+    Predict: <input type="text" id="predict" ref="predict" value="0.2,0.2"><br>
+  <div class="predict-value">
+    <button @click="predict">Predict</button>
+  </div>
+  </div>
   <div class="tester" ref="tester"></div>
 </div>
 </template>
 
 <script>
 import Plotly from 'plotly.js-dist'
+import KNN from 'ml-knn'
+
 export default {
   data () {
     return {
@@ -40,7 +48,8 @@ export default {
         [1, 2],
         [2, 1]],
       predictions: [0, 0, 0, 1, 1, 1],
-      Length: 6
+      Length: 6,
+      predictValue: []
     }
   },
   methods: {
@@ -49,7 +58,6 @@ export default {
       const newpredictions = this.$refs.label.value
       this.dataset.push(newData)
       this.predictions.push(Number(newpredictions))
-      this.Length = this.Length + 1
     },
     plot () {
       const X = []
@@ -95,9 +103,27 @@ export default {
         name: 'Label 1',
         marker: { size: 12 }
       }
+      const trace3 = {
+        x: [Number(this.predictValue[0])],
+        y: [Number(this.predictValue[1])],
+        mode: 'markers',
+        type: 'scatter',
+        name: 'Predict',
+        marker: { size: 12 }
+      }
       const TESTER = this.$refs.tester
-      const data = [trace1, trace2]
+      const data = [trace1, trace2, trace3]
       Plotly.newPlot(TESTER, data)
+    },
+    predict () {
+      this.predictValue = this.$refs.predict.value.split(',')
+      const pred = []
+      this.predictValue.forEach(i => {
+        pred.push(Number(i))
+      })
+      const knn = new KNN(this.dataset, this.predictions)
+      const ans = knn.predict(pred)
+      console.log(ans)
     }
   }
 }
