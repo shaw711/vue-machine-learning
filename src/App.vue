@@ -1,8 +1,8 @@
 <template>
   <div id="app">
     <LinearRegression v-if="notshow"></LinearRegression>
-    <knn></knn>
-    <Kmeans v-if="notshow"></Kmeans>
+    <knn v-if="notshow"></knn>
+    <Kmeans></Kmeans>
   </div>
 </template>
 
