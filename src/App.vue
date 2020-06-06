@@ -1,27 +1,22 @@
 <template>
   <div id="app">
-    <LinearRegression v-if="notshow"></LinearRegression>
-    <knn v-if="notshow"></knn>
-    <Kmeans></Kmeans>
+     <div id="nav">
+       <h2>algorithm</h2>
+      <router-link to="/linear">Linear Regression</router-link> |
+      <router-link to="/knn">KNN</router-link> |
+      <router-link to="/km">Kmeas</router-link>
+      <router-view/>
+    </div>
   </div>
 </template>
 
 <script>
-import LinearRegression from './components/LinearRegression'
-import knn from './components/knn'
-import Kmeans from './components/Kmeans'
-
 export default {
   name: 'App',
   data () {
     return {
       notshow: false
     }
-  },
-  components: {
-    LinearRegression,
-    knn,
-    Kmeans
   }
 }
 </script>

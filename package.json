@@ -12,7 +12,8 @@
     "ml-knn": "^3.0.0",
     "ml-regression-simple-linear": "^2.0.2",
     "plotly.js-dist": "^1.54.1",
-    "vue": "^2.6.11"
+    "vue": "^2.6.11",
+    "vue-router": "^3.3.2"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~4.4.0",
