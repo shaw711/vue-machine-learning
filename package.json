@@ -8,6 +8,7 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "ml-dataset-iris": "^1.1.1",
     "ml-kmeans": "^5.0.0",
     "ml-knn": "^3.0.0",
     "ml-regression-simple-linear": "^2.0.2",
