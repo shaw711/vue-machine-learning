@@ -17,7 +17,9 @@
     </div>
     <div id="train-wrapper">
       <button @click="RFtrain">Random Forest</button> |
-      <button @click="Knntrain">Knn</button>
+      <button @click="Knntrain">Knn</button> |
+      <button @click="Svmtrain">SVM</button> |
+      <button @click="DTtrain">Decision Tree</button>
     </div>
     <div ref="plot4" class="plot4"></div>
   </div>
@@ -28,6 +30,8 @@ import IrisDataset from 'ml-dataset-iris'
 import Plotly from 'plotly.js-dist'
 import { RandomForestClassifier as RFClassifier } from 'ml-random-forest'
 import KNN from 'ml-knn'
+import SVM from 'libsvm-js/asm'
+import { DecisionTreeClassifier as DTClassifier } from 'ml-cart'
 
 export default {
   data () {
@@ -40,10 +44,6 @@ export default {
   },
   methods: {
     RFtrain () {
-      const trainingSet = IrisDataset.getNumbers()
-      const predictions = IrisDataset.getClasses().map((elem) =>
-        IrisDataset.getDistinctClasses().indexOf(elem)
-      )
       const options = {
         seed: 3,
         maxFeatures: 0.8,
@@ -51,9 +51,32 @@ export default {
         nEstimators: 25
       }
       const classifier = new RFClassifier(options)
-      classifier.train(trainingSet, predictions)
-      const result = classifier.predict(trainingSet)
-      console.log(result)
+      classifier.train(this.dataset, this.labels.slice(0, 130))
+      const result = classifier.predict(this.dataset)
+      var sum1 = result.reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var sum2 = this.labels.slice(0, 130).reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var trace1 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum1),
+        name: 'Predicted Value',
+        type: 'bar'
+      }
+      var trace2 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum2),
+        name: 'True Value',
+        type: 'bar'
+      }
+      const plot4 = this.$refs.plot4
+      var data = [trace1, trace2]
+      var layout = { barmode: 'group' }
+      Plotly.newPlot(plot4, data, layout)
     },
     Knntrain () {
       const knn = new KNN(this.dataset, this.labels.slice(0, 130))
@@ -83,7 +106,76 @@ export default {
       var data = [trace1, trace2]
       var layout = { barmode: 'group' }
       Plotly.newPlot(plot4, data, layout)
+    },
+    Svmtrain () {
+      const options = {
+        kernel: SVM.KERNEL_TYPES.POLYNOMIAL,
+        degree: 3
+      }
+      const svm = new SVM(options)
+      svm.train(this.dataset, this.labels.slice(0, 130))
+      const result = svm.predict(this.dataset)
+      var sum1 = result.reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var sum2 = this.labels.slice(0, 130).reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var trace1 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum1),
+        name: 'Predicted Value',
+        type: 'bar'
+      }
+      var trace2 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum2),
+        name: 'True Value',
+        type: 'bar'
+      }
+      const plot4 = this.$refs.plot4
+      var data = [trace1, trace2]
+      var layout = { barmode: 'group' }
+      Plotly.newPlot(plot4, data, layout)
+    },
+    DTtrain () {
+      var options = {
+        gainFunction: 'gini',
+        maxDepth: 10,
+        minNumSamples: 3
+      }
+      var classifier = new DTClassifier(options)
+      classifier.train(this.dataset, this.labels.slice(0, 130))
+      var result = classifier.predict(this.dataset)
+      console.log(result)
+      var sum1 = result.reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var sum2 = this.labels.slice(0, 130).reduce(function (prev, next) {
+        prev[next] = prev[next] + 1 || 1
+        return prev
+      }, {})
+      var trace1 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum1),
+        name: 'Predicted Value',
+        type: 'bar'
+      }
+      var trace2 = {
+        x: ['Iris-setosa', 'Iris-versicolor', 'Iris-virginica'],
+        y: Object.values(sum2),
+        name: 'True Value',
+        type: 'bar'
+      }
+      const plot4 = this.$refs.plot4
+      var data = [trace1, trace2]
+      var layout = { barmode: 'group' }
+      Plotly.newPlot(plot4, data, layout)
     }
+
   },
   created: function () {
     this.labels = IrisDataset.getClasses().map((elem) =>

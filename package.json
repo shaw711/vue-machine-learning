@@ -8,9 +8,14 @@
     "lint": "vue-cli-service lint"
   },
   "dependencies": {
+    "libsvm-js": "^0.2.1",
+    "ml-cart": "^2.0.1",
     "ml-dataset-iris": "^1.1.1",
     "ml-kmeans": "^5.0.0",
     "ml-knn": "^3.0.0",
+    "ml-logistic-regression": "^2.0.0",
+    "ml-matrix": "^6.5.0",
+    "ml-naivebayes": "^4.0.0",
     "ml-random-forest": "^2.0.1",
     "ml-regression-simple-linear": "^2.0.2",
     "plotly.js-dist": "^1.54.1",
