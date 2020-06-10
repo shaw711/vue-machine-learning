@@ -1,6 +1,13 @@
 # vue-machine-learning
 
 ## Project setup
+
+
+```
+git clone https://github.com/genyu818/vue-machine-leanrning.git
+
+```
+
 ```
 npm install
 ```
