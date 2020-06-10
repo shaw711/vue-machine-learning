@@ -10,7 +10,8 @@
     <div id="nav-case-study">
       <h2>Case Study</h2>
       <router-link to="/titanic">Titanic</router-link> |
-      <router-link to="/iris">Iris</router-link>
+      <router-link to="/iris">Iris</router-link> |
+      <router-link to="/leaf">Leaf</router-link>
       <router-view/>
     </div>
   </div>

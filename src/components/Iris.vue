@@ -187,6 +187,7 @@ export default {
   },
   mounted: function () {
     const points = []
+    console.log(this.dataset.map(item => { return item[0] }))
     const trace1 = {
       y: this.dataset.map(item => { return item[0] }),
       type: 'box',
