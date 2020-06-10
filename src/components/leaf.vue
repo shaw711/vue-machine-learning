@@ -3,11 +3,11 @@
     <div id="table-wrapper">
       <table>
         <tr>
-          <td>
+          <td v-for="(item, index) of names" :key="index">{{item}}
           </td>
         </tr>
-        <tr>
-          <td>
+        <tr v-for="(row, index) of showdata" :key="index">
+          <td v-for="(item,id) of row" :key="id">{{item}}
           </td>
         </tr>
       </table><br>
@@ -37,7 +37,12 @@ export default {
       trainingSetX: [],
       trainingSetY: [],
       testingSetX: [],
-      testingSetY: []
+      testingSetY: [],
+      names: ['type', 'specimenNumber', 'eccentricity',
+        'aspectRatio', 'elongation', 'solidity', 'stochasticConvexity',
+        'isoperimetricFactor', 'maxIndetationDepth', 'lobedness', 'intensity',
+        'contrast', 'smoothness', 'thirdMoment', 'uniformity', 'entropy'],
+      showdata: []
     }
   },
   methods: {
@@ -116,7 +121,7 @@ export default {
     this.trainingSetY = y.slice(0, seperationSize)
     this.testingSetX = X.slice(seperationSize)
     this.testingSetY = y.slice(seperationSize)
-    console.log(new Matrix(this.testingSetX))
+    this.showdata = X.slice(0, 20)
   }
 }
 </script>
