@@ -1,19 +1,37 @@
 <template>
   <div id="app">
-     <div id="nav-algorithm">
-       <h2>algorithm</h2>
-      <router-link to="/linear">Linear Regression</router-link> |
-      <router-link to="/knn">KNN</router-link> |
-      <router-link to="/km">Kmeas</router-link>
-
-    </div>
-    <div id="nav-case-study">
-      <h2>Case Study</h2>
-      <router-link to="/titanic">Titanic</router-link> |
-      <router-link to="/iris">Iris</router-link> |
-      <router-link to="/leaf">Leaf</router-link>
-      <router-view/>
-    </div>
+    <el-row :gutter="20">
+      <el-menu
+        :default-active="this.$route.path"
+        class="el-menu-demo"
+        mode="horizontal"
+        background-color="#545c64"
+        text-color="#fff"
+        active-text-color="#ffd04b"
+        router>
+        <el-col :span="6"><div class="grid-content bg-purple">
+          <el-menu-item index="1" class="grid-content-font">Introduction</el-menu-item>
+        </div></el-col>
+        <el-col :span="6"><div class="grid-content bg-purple">
+          <el-submenu index="2" class="grid-content-font">
+            <template slot="title">Algorithm</template>
+            <el-menu-item index="/linear" route="/linear">Linear Regression</el-menu-item>
+            <el-menu-item index="2-2">KNN</el-menu-item>
+            <el-menu-item index="2-3">KMeans</el-menu-item>
+          </el-submenu>
+        </div></el-col>
+        <el-col :span="6"><div class="grid-content bg-purple">
+          <el-submenu index="3" class="grid-content-font">
+            <template slot="title">Case Study</template>
+            <el-menu-item index="3-1">Iris</el-menu-item>
+            <el-menu-item index="3-2">Leaf</el-menu-item>
+            <el-menu-item index="3-3">Titanic</el-menu-item>
+          </el-submenu>
+        </div></el-col>
+      </el-menu>
+    </el-row>
+  <div class="line"></div>
+  <router-view></router-view>
   </div>
 </template>
 
@@ -22,18 +40,39 @@ export default {
   name: 'App',
   data () {
     return {
-      notshow: false
     }
   }
 }
 </script>
 
 <style lang="stylus">
-#app
-  font-family Avenir, Helvetica, Arial, sans-serif
-  -webkit-font-smoothing antialiased
-  -moz-osx-font-smoothing grayscale
-  text-align center
-  color #2c3e50
-  margin-top 60px
+  .el-row {
+    margin-bottom: 20px;
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  .el-col {
+    border-radius: 4px;
+  }
+  .bg-purple-dark {
+    background: #99a9bf;
+  }
+  .bg-purple {
+    background: #d3dce6;
+  }
+  .bg-purple-light {
+    background: #e5e9f2;
+  }
+  .grid-content {
+    border-radius: 4px;
+    min-height: 36px;
+  }
+  .row-bg {
+    padding: 10px 0;
+    background-color: #f9fafc;
+  }
+  .grid-content-font {
+    text-align:center
+  }
 </style>
