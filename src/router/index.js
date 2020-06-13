@@ -5,6 +5,7 @@ import Knn from '../components/knn'
 import Kmeans from '../components/Kmeans'
 import iris from '../components/Iris'
 import leaf from '../components/leaf'
+import intro from '../components/Intro'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -17,7 +18,8 @@ const routes = [
   { path: '/knn', component: Knn },
   { path: '/km', component: Kmeans },
   { path: '/iris', component: iris },
-  { path: '/leaf', component: leaf }
+  { path: '/leaf', component: leaf },
+  { path: '/intro', component: intro }
 ]
 
 const router = new VueRouter({

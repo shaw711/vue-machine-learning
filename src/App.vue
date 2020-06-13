@@ -9,25 +9,19 @@
         text-color="#fff"
         active-text-color="#ffd04b"
         router>
-        <el-col :span="6"><div class="grid-content bg-purple">
-          <el-menu-item index="1" class="grid-content-font">Introduction</el-menu-item>
-        </div></el-col>
-        <el-col :span="6"><div class="grid-content bg-purple">
+          <el-menu-item index="/intro" route="/intro" class="grid-content-font">Introduction</el-menu-item>
           <el-submenu index="2" class="grid-content-font">
             <template slot="title">Algorithm</template>
             <el-menu-item index="/linear" route="/linear">Linear Regression</el-menu-item>
             <el-menu-item index="2-2">KNN</el-menu-item>
             <el-menu-item index="2-3">KMeans</el-menu-item>
           </el-submenu>
-        </div></el-col>
-        <el-col :span="6"><div class="grid-content bg-purple">
           <el-submenu index="3" class="grid-content-font">
             <template slot="title">Case Study</template>
             <el-menu-item index="3-1">Iris</el-menu-item>
             <el-menu-item index="3-2">Leaf</el-menu-item>
             <el-menu-item index="3-3">Titanic</el-menu-item>
           </el-submenu>
-        </div></el-col>
       </el-menu>
     </el-row>
   <div class="line"></div>
