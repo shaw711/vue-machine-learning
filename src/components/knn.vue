@@ -1,6 +1,33 @@
 <template>
 <div id="knn">
+   <div class="title-wrapper">
+    <h1 class="title">Introduction to k-Nearest Neighbors: A powerful Machine Learning Algorithm</h1>
+    <div class="sub-title-wrapper">
+      <h3 >
+        Overview
+      </h3>
+      <ul>
+        <li>Understand k nearest neighbor (KNN) – one of the most popular machine learning algorithms</li>
+        <li>Visiution</li>
+      </ul>
+    </div>
+  </div>
+  <h3 class="content-title">Introduction</h3>
+  <div class="content-wrapper">
+    <p class="content">In the four years of my data science career, I have built more than 80% classification models
+        and just 15-20% regression models. These ratios can be more or less generalized throughout the industry. The reason behind this bias towards classification models is that most analytical problems involve making a decision.</p>
+    <p class="content">For instance, will a customer attrite or not, should we target customer X for
+        digital campaigns, whether customer has a high potential or not, etc.
+        These analysis are more insightful and directly linked to an implement ation roadmap.</p>
+  </div>
+  <div class="img-wrapper">
+    <h3>A important image to Unserstand KNN</h3>
+    <img class="img" src="https://cdn.analyticsvidhya.com/wp-content/uploads/2018/03/knn3.png">
+  </div>
   <div class="table-wrapper">
+    <h2>
+      Visualization
+    </h2>
     <table>
       <p>dataset</p>
       <tr>
@@ -12,17 +39,16 @@
         <td>{{dataset[id][1]}}</td>
       </tr>
     </table>
-    <div class="label-wrapper">
-      <a>label</a>
-      <p>{{predictions}}</p>
-    </div>
+  </div>
+  <div class="label-wrapper">
+    <a>label</a>
+    <p>{{predictions}}</p>
   </div>
   <div class="inputWarper">
     Ponits: <input type="text" id="x" ref="points" value="0.5,0.5"><br>
     Label: <input type="text" id="y" ref="label" value="0"><br>
   </div>
   <div class="add-wrapper"><button @click="add">Add</button></div>
-  <div class="plot-wrapper"><button @click="plot">Plot</button></div>
   <div class="predict-wrapper">
     Predict: <input type="text" id="predict" ref="predict" value="0.2,0.2"><br>
   <div class="predict-value">
@@ -124,11 +150,35 @@ export default {
       const knn = new KNN(this.dataset, this.predictions)
       const ans = knn.predict(pred)
       console.log(ans)
+      this.plot(this.dataset, this.predictions)
     }
+  },
+  mounted () {
+    this.plot(this.dataset, this.predictions)
+  },
+  updated () {
+    this.plot(this.dataset, this.predictions)
   }
 }
 </script>
 
 <style lang="stylus">
-
+.title-wrapper
+  margin-top 20px
+  .sub-title-wrapper
+    margin-left 20px;
+  .content-title
+    left -200px
+.content-title
+  margin-top 20px
+  margin-bottom -50px
+  margin-left 20px
+.img-wrapper
+  height 300px
+  width 350px
+  margin-top 40px
+  margin:0 auto
+  .img
+    height 100%
+    width 100%
 </style>
