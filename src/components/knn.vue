@@ -2,60 +2,57 @@
 <div id="knn">
    <div class="title-wrapper">
     <h1 class="title">Introduction to k-Nearest Neighbors: A powerful Machine Learning Algorithm</h1>
-    <div class="sub-title-wrapper">
-      <h3 >
-        Overview
-      </h3>
-      <ul>
-        <li>Understand k nearest neighbor (KNN) – one of the most popular machine learning algorithms</li>
-        <li>Visiution</li>
-      </ul>
-    </div>
   </div>
-  <h3 class="content-title">Introduction</h3>
   <div class="content-wrapper">
-    <p class="content">In the four years of my data science career, I have built more than 80% classification models
-        and just 15-20% regression models. These ratios can be more or less generalized throughout the industry. The reason behind this bias towards classification models is that most analytical problems involve making a decision.</p>
-    <p class="content">For instance, will a customer attrite or not, should we target customer X for
-        digital campaigns, whether customer has a high potential or not, etc.
-        These analysis are more insightful and directly linked to an implement ation roadmap.</p>
+      <p class="content">
+        The k-nearest neighbors (KNN) algorithm is a simple, easy-to-implement
+        supervised machine learning algorithm that can be used to solve both classification and regression problems. Pause! Let us unpack that.
+      </p>
+      <p class="content">KNN is a model that classifies data points based on the points that are most similar
+        to it. It uses test data to make an “educated guess” on what an unclassified point should be classified as.</p>
+      <p class="content">Just like almost everything else, KNN works because of the deeply rooted mathematical theories it uses. When implementing KNN, the first step is to transform data points into feature vectors,
+         or their mathematical value. The algorithm then works by finding the distance between the mathematical values of these points. The most common way to find this distance is the Euclidean distance.</p>
   </div>
   <div class="img-wrapper">
-    <h3>A important image to Unserstand KNN</h3>
+    <h3 class="img-title">A image to Unserstand KNN</h3>
     <img class="img" src="https://cdn.analyticsvidhya.com/wp-content/uploads/2018/03/knn3.png">
   </div>
   <div class="table-wrapper">
-    <h2>
-      Visualization
-    </h2>
-    <table>
-      <p>dataset</p>
-      <tr>
-        <td>x</td>
-        <td>y</td>
-      </tr>
-      <tr v-for="(item,id) of dataset.length" :key="id">
-        <td>{{dataset[id][0]}}</td>
-        <td>{{dataset[id][1]}}</td>
-      </tr>
-    </table>
+    <h3>Dataset</h3>
+    <div class="table-content">
+      <table>
+        <tr>
+          <td>x</td>
+          <td>y</td>
+        </tr>
+        <tr v-for="(item,id) of dataset.length" :key="id">
+          <td>{{dataset[id][0]}}</td>
+          <td>{{dataset[id][1]}}</td>
+        </tr>
+      </table>
+    </div>
+    <div class="table-label">
+      <p>{{predictions}}</p>
+    </div>
   </div>
-  <div class="label-wrapper">
-    <a>label</a>
-    <p>{{predictions}}</p>
+  <div class="intreactive-wrapper">
+    <div class="input-wrapper">
+      Ponits: <input type="text" id="x" ref="points" value="0.5,0.5" class="input"><br>
+      Label:     <input type="text" id="y" ref="label" value="0" class="input"><br>
+    </div>
+    <div class="add-wrapper">
+      <button @click="add">
+        Add
+      </button>
+    </div>
+    <div class="plot-wrapper">
+      <div id="tester" ref="tester"></div><br>
+    </div>
+    <div class="predict-wrapper">
+      Predict: <input type="text" id="predict" ref="predict" value="0.2,0.2"><br>
+      <button @click="predict">Predict</button>
+    </div>
   </div>
-  <div class="inputWarper">
-    Ponits: <input type="text" id="x" ref="points" value="0.5,0.5"><br>
-    Label: <input type="text" id="y" ref="label" value="0"><br>
-  </div>
-  <div class="add-wrapper"><button @click="add">Add</button></div>
-  <div class="predict-wrapper">
-    Predict: <input type="text" id="predict" ref="predict" value="0.2,0.2"><br>
-  <div class="predict-value">
-    <button @click="predict">Predict</button>
-  </div>
-  </div>
-  <div class="tester" ref="tester"></div>
 </div>
 </template>
 
@@ -149,7 +146,7 @@ export default {
       })
       const knn = new KNN(this.dataset, this.predictions)
       const ans = knn.predict(pred)
-      console.log(ans)
+      alert(ans)
       this.plot(this.dataset, this.predictions)
     }
   },
@@ -163,22 +160,27 @@ export default {
 </script>
 
 <style lang="stylus">
-.title-wrapper
-  margin-top 20px
-  .sub-title-wrapper
-    margin-left 20px;
-  .content-title
-    left -200px
-.content-title
-  margin-top 20px
-  margin-bottom -50px
-  margin-left 20px
 .img-wrapper
   height 300px
   width 350px
   margin-top 40px
   margin:0 auto
+  .img-title
+    margin-left 50px
   .img
     height 100%
     width 100%
+.table-wrapper
+  margin 0 auto
+  text-align center
+  margin-top 150px
+  .table-content
+    text-align center
+    margin-left 700px
+  .table-label
+    margin-top -120px
+.intreactive-wrapper
+  margin 0 auto
+  text-align center
+  margin-top 150px
 </style>
