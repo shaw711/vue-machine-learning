@@ -1,9 +1,29 @@
 <template>
     <div id="kmeans">
-      <div class="data-wrapper">
-        <div class="data">
+      <div class="title-wrapper">
+        <h1 class="title">Introduction to K-means Clustering</h1>
+      </div>
+      <div class="content-wrapper">
+        <p class="content">The Κ-means clustering algorithm uses iterative refinement to produce a final result. The algorithm inputs are the number of clusters Κ and the data set. The data set is a collection of features for each data point. The algorithms starts with initial estimates for the Κ centroids, which can either be randomly generated or randomly selected from the data set.
+          The algorithm then iterates between 3 steps:
+        </p>
+        <p class="content">
+          1. First we initialize k points, called means, randomly.
+        </p>
+        <p class="content">
+          2. We categorize each item to its closest mean and we update the mean’s coordinates, which are the averages of the items categorized in that mean so far.
+        </p>
+        <p class="content">
+          3. We repeat the process for a given number of iterations and at the end, we have our clusters.
+        </p>
+      </div>
+      <div class="img-wrapper">
+        <img class="img" src="https://miro.medium.com/max/1400/1*OiB2cSYSO4W0LHR9_I-n7A.png">
+      </div>
+      <div class="table-wrapper">
+        <div class="table1">
           <table>
-            <p>dataset</p>
+            <h4>dataset</h4>
             <tr>
               <td>x</td>
               <td>y</td>
@@ -13,8 +33,10 @@
               <td>{{item[1]}}</td>
             </tr>
           </table>
+        </div>
+        <div class="table2">
           <table>
-            <p>centers</p>
+            <h4>centers</h4>
             <tr>
               <td>x</td>
               <td>y</td>
@@ -25,15 +47,15 @@
             </tr>
           </table>
         </div>
+      </div>
+      <div class="intreactive-wrapper">
         <div class="input-wrapper">
           add <input type="text" class="input" ref="input" value="2.5, 2.5">
           <button class="add" @click="add" ref="add">Add</button>
         </div>
-        <div class="train-wrapper">
-          <button @click="train">Train</button>
-        </div>
         <div class="initalplot" ref="initalplot"></div>
         <div class="result-wrapper">
+          <button @click="train">Train</button> |
           <button @click="Seeresult">See the Result</button>
         </div>
         <div class="resultplot" ref="resultplot"></div>
@@ -152,5 +174,11 @@ export default {
 </script>
 
 <style lang="stylus">
-
+.table-wrapper
+  margin-top 50px
+  .table1
+    margin-left 400px
+  .table2
+    margin-top -180px
+    margin-left 900px
 </style>

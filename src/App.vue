@@ -14,7 +14,7 @@
             <template slot="title">Algorithm</template>
             <el-menu-item index="/linear" route="/linear">Linear Regression</el-menu-item>
             <el-menu-item index="/knn" route="/knn">KNN</el-menu-item>
-            <el-menu-item index="2-3">KMeans</el-menu-item>
+            <el-menu-item index="/Km">KMeans</el-menu-item>
           </el-submenu>
           <el-submenu index="3" class="grid-content-font">
             <template slot="title">Case Study</template>

@@ -1,6 +1,6 @@
 <template>
 <div id="knn">
-   <div class="title-wrapper">
+  <div class="title-wrapper">
     <h1 class="title">Introduction to k-Nearest Neighbors: A powerful Machine Learning Algorithm</h1>
   </div>
   <div class="content-wrapper">
