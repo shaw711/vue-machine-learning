@@ -6,6 +6,7 @@ import Kmeans from '../components/Kmeans'
 import iris from '../components/Iris'
 import leaf from '../components/leaf'
 import intro from '../components/Intro'
+import pic from '../components/pic'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -19,7 +20,8 @@ const routes = [
   { path: '/km', component: Kmeans },
   { path: '/iris', component: iris },
   { path: '/leaf', component: leaf },
-  { path: '/intro', component: intro }
+  { path: '/intro', component: intro },
+  { path: '/pic', component: pic }
 ]
 
 const router = new VueRouter({
