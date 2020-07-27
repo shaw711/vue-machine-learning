@@ -13,13 +13,14 @@
           <el-submenu index="2" class="grid-content-font">
             <template slot="title">Algorithm</template>
             <el-menu-item index="/linear" route="/linear">Linear Regression</el-menu-item>
-            <el-menu-item index="/knn" route="/knn">KNN</el-menu-item>
+            <!-- <el-menu-item index="/knn" route="/knn">KNN</el-menu-item> -->
             <el-menu-item index="/Km">KMeans</el-menu-item>
-            <el-menu-item index="/pic">pic</el-menu-item>
+            <!-- <el-menu-item index="/pic">pic</el-menu-item> -->
+            <el-menu-item index="/pic2">KNN</el-menu-item>
           </el-submenu>
           <el-submenu index="3" class="grid-content-font">
             <template slot="title">Case Study</template>
-            <el-menu-item index="3-1">Iris</el-menu-item>
+            <el-menu-item index="/iris" route="/iris">Iris</el-menu-item>
             <el-menu-item index="3-2">Leaf</el-menu-item>
             <el-menu-item index="3-3">Titanic</el-menu-item>
           </el-submenu>
@@ -29,6 +30,9 @@
       </el-menu>
     </el-row>
   <div class="line"></div>
+  <div class="help">
+      <el-button  icon="el-icon-setting" circle @click="handle"></el-button>
+  </div>
   <router-view></router-view>
   </div>
 </template>
@@ -38,6 +42,13 @@ export default {
   name: 'App',
   data () {
     return {
+    }
+  },
+  methods: {
+    handle () {
+      this.$alert('<strong>这是 <i>HTML</i> 片段</strong>', 'How to use the web', {
+        dangerouslyUseHTMLString: true
+      })
     }
   }
 }

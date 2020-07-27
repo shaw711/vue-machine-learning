@@ -48,4 +48,8 @@ export default {
     .normal-word
       width 100%
       font-family cursive
+  .help
+    position absolute
+    top 750px
+    right 50px
 </style>

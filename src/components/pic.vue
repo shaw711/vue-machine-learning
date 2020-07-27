@@ -92,6 +92,7 @@ export default {
       return result
     },
     predict (data, k) {
+    //  var d3 = Plotly.d3
       var X_0 = []
       var Y_0 = []
       var X_1 = []
@@ -136,56 +137,133 @@ export default {
           Y_5.push(elem[1])
         }
       }
-      var trace1 = {
-        x: X_0,
-        y: Y_0,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class A',
-        marker: { size: 12 }
-      }
-      var trace2 = {
-        x: X_1,
-        y: Y_1,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class B',
-        marker: { size: 12 }
-      }
-      var trace3 = {
-        x: X_2,
-        y: Y_2,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class C',
-        marker: { size: 12 }
-      }
-      var trace4 = {
-        x: X_3,
-        y: Y_3,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class D',
-        marker: { size: 12 }
-      }
-      var trace5 = {
-        x: X_4,
-        y: Y_4,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class E',
-        marker: { size: 12 }
-      }
-      var trace6 = {
-        x: X_5,
-        y: Y_5,
-        mode: 'markers',
-        type: 'scatter',
-        name: 'class F',
-        marker: { size: 12 }
-      }
       const TESTER = this.$refs.tester
-      var plotdata = [trace1, trace2, trace3, trace4, trace5, trace6]
+      // var plotdata = [trace1, trace2, trace3, trace4, trace5, trace6]
+      var plotdata = [
+        {
+          x: X_0,
+          y: Y_0,
+          mode: 'markers',
+          name: 'class A'
+
+        }, {
+          x: X_1,
+          y: Y_1,
+          mode: 'markers',
+          name: 'class B'
+        }, {
+          x: X_2,
+          y: Y_2,
+          mode: 'markers',
+          name: 'class C'
+        }, {
+          x: X_3,
+          y: Y_3,
+          mode: 'markers',
+          name: 'class D'
+        }, {
+          x: X_4,
+          y: Y_4,
+          mode: 'markers',
+          name: 'class F'
+        }, {
+          x: X_5,
+          y: Y_5,
+          mode: 'markers',
+          name: 'class E'
+        }
+      ]
+      // var layout = {
+      //   shapes: [
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_0),
+      //       y0: d3.min(Y_0),
+      //       x1: d3.max(X_0),
+      //       y1: d3.max(Y_0),
+      //       opacity: 0.8,
+      //       fillcolor: 'blue',
+      //       line: {
+      //         color: 'blue'
+      //       }
+      //     },
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_1),
+      //       y0: d3.min(Y_1),
+      //       x1: d3.max(X_1),
+      //       y1: d3.max(Y_1),
+      //       opacity: 0.8,
+      //       fillcolor: 'orange',
+      //       line: {
+      //         color: 'orange'
+      //       }
+      //     },
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_2),
+      //       y0: d3.min(Y_2),
+      //       x1: d3.max(X_2),
+      //       y1: d3.max(Y_2),
+      //       opacity: 1,
+      //       fillcolor: 'black',
+      //       line: {
+      //         color: 'black'
+      //       }
+      //     },
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_3),
+      //       y0: d3.min(Y_3),
+      //       x1: d3.max(X_3),
+      //       y1: d3.max(Y_3),
+      //       opacity: 0.2,
+      //       fillcolor: 'red',
+      //       line: {
+      //         color: 'red'
+      //       }
+      //     },
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_4),
+      //       y0: d3.min(Y_4),
+      //       x1: d3.max(X_4),
+      //       y1: d3.max(Y_4),
+      //       opacity: 0.2,
+      //       fillcolor: 'yellow',
+      //       line: {
+      //         color: 'yellow'
+      //       }
+      //     },
+      //     {
+      //       type: 'circle',
+      //       xref: 'x',
+      //       yref: 'y',
+      //       x0: d3.min(X_5),
+      //       y0: d3.min(Y_5),
+      //       x1: d3.max(X_5),
+      //       y1: d3.max(Y_5),
+      //       opacity: 0.2,
+      //       fillcolor: 'rgb(128, 0, 128)',
+      //       line: {
+      //         color: 'rgb(128, 0, 128)'
+      //       }
+      //     }
+      //   ],
+      //   showlegend: true
+      // }
+      console.log(X_2)
+      console.log(Y_2)
       Plotly.newPlot(TESTER, plotdata)
     }
   },
