@@ -17,6 +17,7 @@
             <el-menu-item index="/Km">KMeans</el-menu-item>
             <!-- <el-menu-item index="/pic">pic</el-menu-item> -->
             <el-menu-item index="/pic2">KNN</el-menu-item>
+            <el-menu-item index="/svm">SVM</el-menu-item>
           </el-submenu>
           <el-submenu index="3" class="grid-content-font">
             <template slot="title">Case Study</template>
@@ -26,6 +27,7 @@
           </el-submenu>
           <el-submenu>
             <template slot="title">Custom Web</template>
+            <el-menu-item index="/page" route="/page">Custome Page</el-menu-item>
           </el-submenu>
       </el-menu>
     </el-row>
@@ -46,7 +48,7 @@ export default {
   },
   methods: {
     handle () {
-      this.$alert('<strong>这是 <i>HTML</i> 片段</strong>', 'How to use the web', {
+      this.$alert('<strong>I will  help</strong> you', 'How to use the web', {
         dangerouslyUseHTMLString: true
       })
     }

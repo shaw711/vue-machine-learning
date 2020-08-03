@@ -12,6 +12,7 @@
     "csvtojson": "^2.0.10",
     "element-ui": "^2.13.2",
     "fs": "0.0.1-security",
+    "jquery": "^3.5.1",
     "libsvm-js": "^0.2.1",
     "ml-cart": "^2.0.1",
     "ml-dataset-iris": "^1.1.1",
@@ -24,9 +25,12 @@
     "ml-regression-simple-linear": "^2.0.2",
     "papaparse": "^5.2.0",
     "plotly.js-dist": "^1.54.1",
+    "svm": "^0.1.1",
     "vue": "^2.6.11",
     "vue-mathjax": "0.0.11",
-    "vue-router": "^3.3.2"
+    "vue-router": "^3.3.2",
+    "vue-slider-component": "^3.2.2",
+    "xlsx": "^0.16.4"
   },
   "devDependencies": {
     "@vue/cli-plugin-eslint": "~4.4.0",

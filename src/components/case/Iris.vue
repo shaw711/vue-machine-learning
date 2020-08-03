@@ -1,21 +1,60 @@
 <template>
   <div id="app">
-    <div id="table-wrapper">
-      <table>
+    <div id="table-wrapper" class="table-wrapper">
+      <h2>Dataset</h2>
+      <!-- <table>
         <tr>
           <td v-for="(rowname,id) of rownames" :key="id">{{rowname}}</td>
         </tr>
         <tr v-for="(item, index0) of showdata" :key="index0">
           <td v-for="(a,index1) of item" :key="index1">{{a}}</td>
         </tr>
-      </table>
+      </table> -->
+      <template>
+        <el-table
+          :data="Sdata"
+          style="width: 70%">
+          <el-table-column
+            prop="Speall"
+            label="Speal Length"
+            width="150"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="SpealW"
+            label="Speal Width"
+            width="150"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="Petall"
+            label="Petal Length"
+            width="150"
+            sortable>
+          </el-table-column>
+           <el-table-column
+            prop="PetalW"
+            label="Petal Width"
+            width="150"
+            sortable>
+          </el-table-column>
+          <el-table-column
+            prop="labels"
+            label="Labels"
+            width="150"
+            sortable>
+          </el-table-column>
+        </el-table>
+      </template>
     </div>
     <div class="plot-wrapper">
+      <h2>Visualization</h2>
       <div class="plot1" ref="plot1"></div>
       <div class="plot2" ref="plot2"></div>
       <div class="plot3" ref="plot3"></div>
     </div>
     <div id="train-wrapper">
+      <h2>Model</h2>
       <button @click="RFtrain">Random Forest</button> |
       <button @click="Knntrain">Knn</button> |
       <button @click="Svmtrain">SVM</button> |
@@ -39,7 +78,8 @@ export default {
       labels: [],
       dataset: [],
       rownames: [],
-      showdata: []
+      showdata: [],
+      Sdata: []
     }
   },
   methods: {
@@ -52,6 +92,9 @@ export default {
       }
       const classifier = new RFClassifier(options)
       classifier.train(this.dataset, this.labels.slice(0, 130))
+      console.log(this.dataset)
+      console.log(this.labels.slice(0, 130))
+
       const result = classifier.predict(this.dataset)
       var sum1 = result.reduce(function (prev, next) {
         prev[next] = prev[next] + 1 || 1
@@ -184,10 +227,24 @@ export default {
     this.dataset = IrisDataset.getNumbers()
     this.rownames = ['Sepal length', 'Sepal width', 'Petal length', 'Petal width']
     this.showdata = this.dataset.splice(1, 20)
+    var l = []
+    IrisDataset.getClasses().map((elem) =>
+      l.push(elem)
+    )
+    var newL = l.slice(0, 10).concat(l.slice(95, 105))
+    for (let i = 0; i < this.showdata.length; i++) {
+      var obj = {
+        Speall: this.showdata[i][0],
+        SpealW: this.showdata[i][1],
+        Petall: this.showdata[i][2],
+        PetalW: this.showdata[i][3],
+        labels: newL[i]
+      }
+      this.Sdata.push(obj)
+    }
   },
   mounted: function () {
     const points = []
-    console.log(this.dataset.map(item => { return item[0] }))
     const trace1 = {
       y: this.dataset.map(item => { return item[0] }),
       type: 'box',
@@ -285,6 +342,14 @@ export default {
 }
 </script>
 
-<style>
-
+<style lang="stylus">
+.table-wrapper
+  margin 0 auto
+  width 80%
+.plot-wrapper
+  margin 0 auto
+  width 80%
+  margin-top 50px
+.train-wrapper
+  height 100px
 </style>

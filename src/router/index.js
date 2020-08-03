@@ -8,6 +8,8 @@ import iris from '../components/case/Iris'
 import intro from '../components/Intro'
 import pic from '../components/pic'
 import pic2 from '../components/pic2'
+import svm from '../components/Algorithm/Svm'
+import cus from '../components/Custom page/page'
 
 Vue.use(VueRouter)
 const originalPush = VueRouter.prototype.push
@@ -30,7 +32,9 @@ const routes = [{
 // { path: '/leaf', component: leaf },
 { path: '/intro', component: intro },
 { path: '/pic', component: pic },
-{ path: '/pic2', component: pic2 }
+{ path: '/pic2', component: pic2 },
+{ path: '/svm', component: svm },
+{ path: '/page', component: cus }
 ]
 
 const router = new VueRouter({
