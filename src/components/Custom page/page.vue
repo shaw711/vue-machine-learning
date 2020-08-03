@@ -73,7 +73,7 @@ import abalone from '../../common/abalone'
 import cryo from '../../common/Cryotherapy'
 import KNN from 'ml-knn'
 import LG from 'ml-logistic-regression'
-// import { DecisionTreeClassifier as DTClassifier } from 'ml-cart'
+import { DecisionTreeClassifier as DTClassifier } from 'ml-cart'
 
 export default {
   name: 'page',
@@ -184,10 +184,27 @@ export default {
         }
       })
       this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var knn = new KNN(this.dataset, this.labels)
+      var label = this.getRepeatNum(this.labels)
+      var labNum = []
+      this.labels.forEach(elem => {
+        for (var i = 0; i < label.length; i++) {
+          if (elem === Number(label[i])) {
+            labNum.push(i)
+          }
+        }
+      })
+      var knn = new KNN(this.dataset, labNum)
       var ans = knn.predict(this.dataset)
-      console.log(ans)
-      console.log(this.showData)
+      var cateNum = this.getRepeatNum(ans)
+      var finalAns = []
+      ans.forEach(elem => {
+        for (var i = 0; i < cateNum.length; i++) {
+          if (elem === Number(cateNum[i])) {
+            finalAns.push(label[i])
+          }
+        }
+      })
+      console.log(finalAns)
     },
     svm () {
       this.dataset = []
@@ -207,16 +224,34 @@ export default {
           }
         }
       })
+      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+      var label = this.getRepeatNum(this.labels)
+      var labNum = []
+      this.labels.forEach(elem => {
+        for (var i = 0; i < label.length; i++) {
+          if (String(elem) === (label[i])) {
+            labNum.push(i)
+          }
+        }
+      })
       const SVM = require('libsvm-js/asm')
       const options = {
         kernel: SVM.KERNEL_TYPES.POLYNOMIAL,
         degree: 3
       }
       const svm = new SVM(options)
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      svm.train(this.dataset, this.labels)
-      console.log(this.showData)
-      console.log(svm.predict(this.dataset))
+      svm.train(this.dataset, labNum)
+      var ans = svm.predict(this.dataset)
+      var cateNum = this.getRepeatNum(ans)
+      var finalAns = []
+      ans.forEach(elem => {
+        for (var i = 0; i < cateNum.length; i++) {
+          if (elem === Number(cateNum[i])) {
+            finalAns.push(label[i])
+          }
+        }
+      })
+      console.log(finalAns)
     },
     logistic () {
       this.dataset = []
@@ -237,11 +272,29 @@ export default {
         }
       })
       this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+      var label = this.getRepeatNum(this.labels)
+      var labNum = []
+      this.labels.forEach(elem => {
+        for (var i = 0; i < label.length; i++) {
+          if (String(elem) === (label[i])) {
+            labNum.push(i)
+          }
+        }
+      })
       const logreg = new LG({ numSteps: 5000, learningRate: 5e-3 })
       const { Matrix } = require('ml-matrix')
-      console.log(Matrix.columnVector(this.labels))
-      logreg.train(new Matrix(this.dataset), Matrix.columnVector(this.labels))
-      console.log(logreg.predict(new Matrix(this.dataset)))
+      logreg.train(new Matrix(this.dataset), Matrix.columnVector(labNum))
+      var ans = logreg.predict(new Matrix(this.dataset))
+      var cateNum = this.getRepeatNum(ans)
+      var finalAns = []
+      ans.forEach(elem => {
+        for (var i = 0; i < cateNum.length; i++) {
+          if (elem === Number(cateNum[i])) {
+            finalAns.push(label[i])
+          }
+        }
+      })
+      console.log(finalAns)
     },
     dt () {
       this.dataset = []
@@ -262,13 +315,21 @@ export default {
         }
       })
       this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      // var classifier = new DTClassifier()
       console.log(this.dataset)
       console.log(this.labels)
-      // classifier.train(this.dataset, this.labels)
-      // var result = classifier.predict(this.dataset)
-      // console.log(result)
+      DTClassifier.train(this.dataset, this.labels)
+      var result = DTClassifier.predict(this.dataset)
+      console.log(result)
+    },
+    getRepeatNum (arr) {
+      var obj = {}
+      for (var i = 0, l = arr.length; i < l; i++) {
+        var item = arr[i]
+        obj[item] = (obj[item] + 1) || 1
+      }
+      return Object.keys(obj)
     }
+
   },
   created () {
 
