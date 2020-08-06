@@ -135,9 +135,9 @@ export default {
           this.xlsxJson = tabJson[0].sheet
           this.showData = this.xlsxJson
           this.rowname = Object.keys(this.showData[0])
-          this.$nextTick(function () {
-            this.tshow = true
-          })
+          var that = this
+          this.tshow = false
+          setTimeout(function () { that.tshow = true }, 100)
         }
       })
     },
@@ -167,21 +167,31 @@ export default {
       this.col = []
       this.response = ''
       this.showplot = false
+      this.rowname = null
+      this.showData = null
     },
     chooseIris () {
+      var that = this
+      this.tshow = false
       this.showData = Iris
       this.rowname = Object.keys(this.showData[0])
-      this.tshow = true
+      setTimeout(function () { that.tshow = true }, 100)
     },
     chooseabalone () {
+      var that = this
+      this.tshow = false
+      this.handle()
       this.showData = abalone
       this.rowname = Object.keys(this.showData[0])
-      this.tshow = true
+      setTimeout(function () { that.tshow = true }, 100)
     },
     choosecryo () {
+      var that = this
+      this.tshow = false
+      this.handle()
       this.showData = cryo
       this.rowname = Object.keys(this.showData[0])
-      this.tshow = true
+      setTimeout(function () { that.tshow = true }, 100)
     },
     knn () {
       this.X = []
