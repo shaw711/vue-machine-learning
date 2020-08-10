@@ -66,8 +66,8 @@
       <el-col :span="15">
            <tableshow ref='tabledata' id="table" v-if="tshow" :tabledata="showData"></tableshow>
               <div>
-                <div class="plot1" ref="plot1" v-show="showplot" style="float:left"></div>
-                <div class="plot2" ref="plot2" v-show="showplot" style="float:left"></div>
+                <div class="plot1" ref="plot1" id="plot1" v-show="showplot" style="float:left"></div>
+                <!-- <div class="plot2" ref="plot2" v-show="showplot" style="float:left"></div> -->
                 <div class="plot3" ref="plot3" v-show="showplot" style="float:left"></div>
                 <div style="clear:both"></div>
               </div>
@@ -137,6 +137,9 @@ export default {
           this.rowname = Object.keys(this.showData[0])
           var that = this
           this.tshow = false
+          this.col = []
+          this.showplot = false
+          this.response = []
           setTimeout(function () { that.tshow = true }, 100)
         }
       })
@@ -198,704 +201,952 @@ export default {
       this.Y = []
       this.labels = []
       this.dataset = []
-      if (this.col.length !== 2) {
+      this.showplot = false
+      if (this.col.length < 2) {
         this.$message.error({
           message: 'Please choose 2 clomuns'
         })
         this.handle()
-      }
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
-        }
-      })
-      var knn = new KNN(this.dataset, labNum)
-      var ans = knn.predict(this.dataset)
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (String(elem) === String(cateNum[i])) {
-            finalAns.push(label[i])
+        })
+        var knn = new KNN(this.dataset, labNum)
+        var ans = knn.predict(this.dataset)
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const knn = new KNN(this.dataset, labNum)
+        const ans = knn.predict(this.dataset)
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      const plot1 = this.$refs.plot1
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      Plotly.newPlot(plot1, data1, layout1)
-
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'True Value',
-        type: 'bar'
-      }
-      var data3 = [trace3, trace4]
-      var layout2 = {
-        title: 'True Value VS Predict Value'
-      }
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     svm () {
-      this.dataset = []
       this.X = []
       this.Y = []
       this.labels = []
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      this.dataset = []
+      this.showplot = false
+      if (this.col.length < 2) {
+        this.$message.error({
+          message: 'Please choose 2 clomuns'
+        })
+        this.handle()
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
+        })
+        const SVM = require('libsvm-js/asm')
+        const options = {
+          kernel: SVM.KERNEL_TYPES.POLYNOMIAL,
+          degree: 3
         }
-      })
-      const SVM = require('libsvm-js/asm')
-      const options = {
-        kernel: SVM.KERNEL_TYPES.POLYNOMIAL,
-        degree: 3
-      }
-      const svm = new SVM(options)
-      svm.train(this.dataset, labNum)
-      var ans = svm.predict(this.dataset)
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (elem === Number(cateNum[i])) {
-            finalAns.push(label[i])
+        const svm = new SVM(options)
+        svm.train(this.dataset, labNum)
+        const ans = svm.predict(this.dataset)
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const SVM = require('libsvm-js/asm')
+        const options = {
+          kernel: SVM.KERNEL_TYPES.POLYNOMIAL,
+          degree: 3
+        }
+        const svm = new SVM(options)
+        svm.train(this.dataset, labNum)
+        const ans = svm.predict(this.dataset)
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      const plot1 = this.$refs.plot1
-      Plotly.newPlot(plot1, data1, layout1)
-
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'True Value',
-        type: 'bar'
-      }
-      var data3 = [trace3, trace4]
-      var layout2 = {
-        title: 'True Vlaue VS Predict Value'
-      }
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     logistic () {
-      this.dataset = []
       this.X = []
       this.Y = []
       this.labels = []
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      this.dataset = []
+      this.showplot = false
+      if (this.col.length < 2) {
+        this.$message.error({
+          message: 'Please choose 2 clomuns'
+        })
+        this.handle()
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
-        }
-      })
-      const logreg = new LG({ numSteps: 5000, learningRate: 5e-3 })
-      const { Matrix } = require('ml-matrix')
-      logreg.train(new Matrix(this.dataset), Matrix.columnVector(labNum))
-      var ans = logreg.predict(new Matrix(this.dataset))
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (elem === Number(cateNum[i])) {
-            finalAns.push(label[i])
+        })
+        const logreg = new LG({ numSteps: 5000, learningRate: 5e-3 })
+        const { Matrix } = require('ml-matrix')
+        logreg.train(new Matrix(this.dataset), Matrix.columnVector(labNum))
+        var ans = logreg.predict(new Matrix(this.dataset))
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const logreg = new LG({ numSteps: 5000, learningRate: 5e-3 })
+        const { Matrix } = require('ml-matrix')
+        logreg.train(new Matrix(this.dataset), Matrix.columnVector(labNum))
+        const ans = logreg.predict(new Matrix(this.dataset))
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      const plot1 = this.$refs.plot1
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      Plotly.newPlot(plot1, data1, layout1)
-
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'Real Value',
-        type: 'bar'
-      }
-      var layout2 = {
-        title: 'True Value VS Predict Value'
-      }
-      var data3 = [trace3, trace4]
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     dt () {
-      this.dataset = []
       this.X = []
       this.Y = []
       this.labels = []
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      this.dataset = []
+      this.showplot = false
+      if (this.col.length < 2) {
+        this.$message.error({
+          message: 'Please choose 2 clomuns'
+        })
+        this.handle()
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
-        }
-      })
-      var classifier = new DTClassifier()
-      classifier.train(this.dataset, labNum)
-      var ans = classifier.predict(this.dataset)
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (elem === Number(cateNum[i])) {
-            finalAns.push(label[i])
+        })
+        var classifier = new DTClassifier()
+        classifier.train(this.dataset, labNum)
+        var ans = classifier.predict(this.dataset)
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const classifier = new DTClassifier()
+        classifier.train(this.dataset, labNum)
+        const ans = classifier.predict(this.dataset)
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      const plot1 = this.$refs.plot1
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      Plotly.newPlot(plot1, data1, layout1)
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'Real Value',
-        type: 'bar'
-      }
-      var layout2 = {
-        title: 'True Value VS Predict Value'
-      }
-      var data3 = [trace3, trace4]
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     rf () {
-      this.dataset = []
       this.X = []
       this.Y = []
       this.labels = []
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      this.dataset = []
+      this.showplot = false
+      if (this.col.length < 2) {
+        this.$message.error({
+          message: 'Please choose 2 clomuns'
+        })
+        this.handle()
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
-        }
-      })
-      var classifier = new RFClassifier()
-      classifier.train(this.dataset, labNum)
-      var ans = classifier.predict(this.dataset)
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (elem === Number(cateNum[i])) {
-            finalAns.push(label[i])
+        })
+        var classifier = new RFClassifier()
+        classifier.train(this.dataset, labNum)
+        var ans = classifier.predict(this.dataset)
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const classifier = new RFClassifier()
+        classifier.train(this.dataset, labNum)
+        const ans = classifier.predict(this.dataset)
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      const plot1 = this.$refs.plot1
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      Plotly.newPlot(plot1, data1, layout1)
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var layout2 = {
-        title: 'True Value VS Predict Value'
-      }
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'Real Value',
-        type: 'bar'
-      }
-      var data3 = [trace3, trace4]
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     nb () {
-      this.dataset = []
       this.X = []
       this.Y = []
       this.labels = []
-      this.showData.forEach(elem => {
-        for (var val in elem) {
-          if (val === this.col[0]) {
-            this.X.push(elem[val])
-          } else
-          if (val === this.col[1]) {
-            this.Y.push(elem[val])
-          } else
-          if (val === this.response) {
-            this.labels.push(elem[val])
+      this.dataset = []
+      this.showplot = false
+      if (this.col.length < 2) {
+        this.$message.error({
+          message: 'Please choose 2 clomuns'
+        })
+        this.handle()
+      } else if (this.col.length === 2) {
+        document.getElementById('plot1').style.display = 'block'
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
           }
-        }
-      })
-      this.dataset = this.X.map((key, value) => [key, this.Y[value]])
-      var label = Object.keys(this.getRepeatNum(this.labels))
-      var labNum = []
-      this.labels.forEach(elem => {
-        for (var i = 0; i < label.length; i++) {
-          if (String(elem) === (label[i])) {
-            labNum.push(i)
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        var label = Object.keys(this.getRepeatNum(this.labels))
+        var labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
           }
-        }
-      })
-      var classifier = new MultinomialNB()
-      classifier.train(this.dataset, labNum)
-      var ans = classifier.predict(this.dataset)
-      var cateNum = Object.keys(this.getRepeatNum(ans))
-      var finalAns = []
-      ans.forEach(elem => {
-        for (var i = 0; i < cateNum.length; i++) {
-          if (elem === Number(cateNum[i])) {
-            finalAns.push(label[i])
+        })
+        var classifier = new MultinomialNB()
+        classifier.train(this.dataset, labNum)
+        var ans = classifier.predict(this.dataset)
+        var cateNum = Object.keys(this.getRepeatNum(ans))
+        var finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
           }
+        })
+        var X = []
+        for (let i = 0; i < label.length; i++) {
+          X[i] = []
         }
-      })
-      var X = []
-      for (let i = 0; i < label.length; i++) {
-        X[i] = []
-      }
 
-      for (var i = 0; i < this.dataset.length; i++) {
-        for (var j = 0; j < label.length; j++) {
-          if (finalAns[i] === label[j]) {
-            X[j].push(this.dataset[i])
+        for (var i = 0; i < this.dataset.length; i++) {
+          for (var j = 0; j < label.length; j++) {
+            if (finalAns[i] === label[j]) {
+              X[j].push(this.dataset[i])
+            }
           }
         }
-      }
-      var data1 = []
-      for (let i = 0; i < X.length; i++) {
-        var trace = {
-          x: X[i].map(elem => { return elem[0] }),
-          y: X[i].map(elem => { return elem[1] }),
-          mode: 'markers',
-          type: 'scatter',
-          marker: { size: 12 },
-          name: label[i]
+        var data1 = []
+        for (let i = 0; i < X.length; i++) {
+          var trace = {
+            x: X[i].map(elem => { return elem[0] }),
+            y: X[i].map(elem => { return elem[1] }),
+            mode: 'markers',
+            type: 'scatter',
+            marker: { size: 12 },
+            name: label[i]
+          }
+          data1.push(trace)
         }
-        data1.push(trace)
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot1 = this.$refs.plot1
+        var layout1 = {
+          title: 'Predict Value'
+        }
+        Plotly.newPlot(plot1, data1, layout1)
+        var trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        var trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        var data3 = [trace3, trace4]
+        var layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
+      } else if (this.col.length > 2) {
+        this.showplot = false
+        document.getElementById('plot1').innerHTML = ''
+        this.showData.forEach(elem => {
+          for (var val in elem) {
+            if (val === this.col[0]) {
+              this.X.push(elem[val])
+            } else
+            if (val === this.col[1]) {
+              this.Y.push(elem[val])
+            } else
+            if (val === this.response) {
+              this.labels.push(elem[val])
+            }
+          }
+        })
+        this.dataset = this.X.map((key, value) => [key, this.Y[value]])
+        const label = Object.keys(this.getRepeatNum(this.labels))
+        const labNum = []
+        this.labels.forEach(elem => {
+          for (var i = 0; i < label.length; i++) {
+            if (String(elem) === (label[i])) {
+              labNum.push(i)
+            }
+          }
+        })
+        const classifier = new MultinomialNB()
+        classifier.train(this.dataset, labNum)
+        const ans = classifier.predict(this.dataset)
+        const cateNum = Object.keys(this.getRepeatNum(ans))
+        const finalAns = []
+        ans.forEach(elem => {
+          for (var i = 0; i < cateNum.length; i++) {
+            if (String(elem) === String(cateNum[i])) {
+              finalAns.push(label[i])
+            }
+          }
+        })
+        const trace3 = {
+          x: Object.keys(this.getRepeatNum(finalAns)),
+          y: Object.values(this.getRepeatNum(finalAns)),
+          name: 'Predicted Value',
+          type: 'bar'
+        }
+        const trace4 = {
+          x: Object.keys(this.getRepeatNum(this.labels)),
+          y: Object.values(this.getRepeatNum(this.labels)),
+          name: 'True Value',
+          type: 'bar'
+        }
+        const data3 = [trace3, trace4]
+        const layout2 = {
+          title: 'True Value VS Predict Value'
+        }
+        this.showplot = true
+        document.getElementById('table').style.display = 'none'
+        const plot3 = this.$refs.plot3
+        Plotly.newPlot(plot3, data3, layout2)
       }
-      this.showplot = true
-      document.getElementById('table').style.display = 'none'
-      const plot1 = this.$refs.plot1
-      var layout1 = {
-        title: 'Predict Value'
-      }
-      Plotly.newPlot(plot1, data1, layout1)
-      // var Y = []
-      // for (let i = 0; i < label.length; i++) {
-      //   Y[i] = []
-      // }
-      // for (let i = 0; i < this.dataset.length; i++) {
-      //   for (let j = 0; j < label.length; j++) {
-      //     if (String(this.labels[i]) === label[j]) {
-      //       Y[j].push(this.dataset[i])
-      //     }
-      //   }
-      // }
-      // var data2 = []
-      // for (let i = 0; i < Y.length; i++) {
-      //   var trace2 = {
-      //     x: Y[i].map(elem => { return elem[0] }),
-      //     y: Y[i].map(elem => { return elem[1] }),
-      //     mode: 'markers',
-      //     type: 'scatter',
-      //     marker: { size: 12 },
-      //     name: label[i]
-      //   }
-      //   data2.push(trace2)
-      // }
-      // const plot2 = this.$refs.plot2
-      // Plotly.newPlot(plot2, data2)
-      var trace3 = {
-        x: Object.keys(this.getRepeatNum(finalAns)),
-        y: Object.values(this.getRepeatNum(finalAns)),
-        name: 'Predicted Value',
-        type: 'bar'
-      }
-      var trace4 = {
-        x: Object.keys(this.getRepeatNum(this.labels)),
-        y: Object.values(this.getRepeatNum(this.labels)),
-        name: 'Real Value',
-        type: 'bar'
-      }
-      var data3 = [trace3, trace4]
-      var layout2 = {
-        title: 'True Value VS Predict Value'
-      }
-      const plot3 = this.$refs.plot3
-      Plotly.newPlot(plot3, data3, layout2)
     },
     getRepeatNum (arr) {
       var obj = {}
